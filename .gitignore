@@ -1,0 +1,22 @@
+# IDE Settings (Definitely ignore this)
+.idea/
+
+# Python internal files
+__pycache__/
+*.py[cod]
+
+# Virtual Environments
+venv/
+.venv/
+
+# Data - Usually best to keep this ignored if it's raw datasets
+Data/
+
+# Model - Ignore the saved weights, keep the Class code
+Model/*.h5
+Model/*.pth
+Model/*.pkl
+Model/*.joblib
+
+# OS files
+.DS_Store
