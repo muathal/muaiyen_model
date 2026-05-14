@@ -1,21 +1,16 @@
 .idea/
 
-# Python internal files
 __pycache__/
 *.py[cod]
 
-# Virtual Environments
 venv/
 .venv/
 
-# Data
 Data/
 
-# Model
 Model/*.h5
 Model/*.pth
 Model/*.pkl
 Model/*.joblib
 
-# OS files
 .DS_Store
