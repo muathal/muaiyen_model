@@ -73,9 +73,12 @@ class SGM(nn.Module):
         self.slot_filing = SlotFiling(attin_size)
         self.intent = Intent(attin_size)
         self.slot_gate = SlotGate(attin_size,slot_size,intent_size)
+        self.dropout = nn.Dropout(p=0.5)
     def forward(self,seq):
         embed_output = self.embed(seq)
         state_output , (final_state) = self.bidirectional(embed_output)
+        final_state = self.dropout(final_state)
+        state_output = self.dropout(state_output)
         final_state = torch.cat([final_state[0], final_state[1]], dim=-1)
         slot_context_vector = self.slot_filing(state_output)
         intent_context_vector = self.intent(final_state,state_output)

@@ -3,9 +3,17 @@ from collections import Counter
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import pad_sequence
+import pandas as pd
 class ERPDataset(Dataset):
-    def __init__(self, data, word2id, intent2id, slot2id):
-        self.data = data
+    def __init__(self, data, word2id, slot2id,intent2id,):
+        if isinstance(data, pd.DataFrame):
+            self.data = data.to_dict(orient='records')
+        else:
+            self.data = data
+        self.data = [
+            item for item in self.data
+            if len(item["text"]) == len(item["slots"])
+        ]
         self.word2id = word2id
         self.intent2id = intent2id
         self.slot2id = slot2id
@@ -43,13 +51,14 @@ def build_mapping(data):
     for intent in data["intent"]:
         if intent not in intent_mapping:
             intent_mapping[intent] = len(intent_mapping)
-    for slot in data["slot"]:
-        if slot not in slot_mapping:
-            slot_mapping[slot] = len(slot_mapping)
+    for slots in data["slots"]:
+        for slot in slots:
+            if slot not in slot_mapping:
+                slot_mapping[slot] = len(slot_mapping)
     intent_unmapping = {value:key for key, value in intent_mapping.items()}
     slot_unmapping = {value:key for key, value in slot_mapping.items()}
     return slot_mapping,intent_mapping,slot_unmapping,intent_unmapping
-#building vocab throught text
+#building vocab through text
 PAD_TOKEN = "<PAD>"
 UNK_TOKEN = "<UNK>"
 def build_vocab(texts, min_freq=2, max_size=50000):
@@ -68,4 +77,3 @@ def build_vocab(texts, min_freq=2, max_size=50000):
             break
     word_unmapping = {value:key for key, value in word_mapping.items()}
     return word_mapping,word_unmapping
-

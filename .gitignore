@@ -1,4 +1,3 @@
-# IDE Settings (Definitely ignore this)
 .idea/
 
 # Python internal files
@@ -9,10 +8,10 @@ __pycache__/
 venv/
 .venv/
 
-# Data - Usually best to keep this ignored if it's raw datasets
+# Data
 Data/
 
-# Model - Ignore the saved weights, keep the Class code
+# Model
 Model/*.h5
 Model/*.pth
 Model/*.pkl
