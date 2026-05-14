@@ -62,7 +62,7 @@ class SlotGate(nn.Module):
         slot_output = torch.cat([slot_gate,state_output],-1)
         intent = self.intent_projection(intent_context_vector)
         slot = self.slot_projection(slot_output)
-        return intent,slot
+        return slot,intent
 
 class SGM(nn.Module):
     def __init__(self,num_embedding,embedding_dim,hidden_size,slot_size,intent_size):
@@ -82,5 +82,5 @@ class SGM(nn.Module):
         final_state = torch.cat([final_state[0], final_state[1]], dim=-1)
         slot_context_vector = self.slot_filing(state_output)
         intent_context_vector = self.intent(final_state,state_output)
-        intent,slot = self.slot_gate(intent_context_vector,slot_context_vector,state_output)
-        return intent , slot
+        slot,intent = self.slot_gate(intent_context_vector,slot_context_vector,state_output)
+        return  slot,intent
