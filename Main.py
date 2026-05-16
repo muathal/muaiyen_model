@@ -4,14 +4,22 @@ import pandas as pd
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score
 from seqeval.metrics import f1_score # The academic standard for BIO tags
+#to load the on cuda (if possible)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Device:", device)
+#setting random state to 42 to get same result every run
 torch.manual_seed(42)
+#data reading and cleaning
 train = pd.read_json("Data/train.json")
 val = pd.read_json("Data/val.json")
 test = pd.read_json("Data/test.json")
+train = clean_entire_dataset(train)
+val = clean_entire_dataset(val)
+test = clean_entire_dataset(test)
+#bulding vocab
 word_mapping,word_unmapping = build_vocab(train["text"])
 slot_mapping,intent_mapping,slot_unmapping,intent_unmapping = build_mapping(train)
+#creating the dataset for the model
 train_data = ERPDataset(train,word_mapping,slot_mapping,intent_mapping)
 val_data = ERPDataset(val,word_mapping,slot_mapping,intent_mapping)
 test_data = ERPDataset(test,word_mapping,slot_mapping,intent_mapping)

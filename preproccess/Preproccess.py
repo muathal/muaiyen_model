@@ -4,16 +4,102 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import pad_sequence
 import pandas as pd
+import nltk
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
+
+# Download requirements once
+nltk.download('wordnet')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('averaged_perceptron_tagger_eng')
+def get_wordnet_pos(word):
+    """Map POS tag to first character lemmatize() accepts"""
+    tag = nltk.pos_tag([word])[0][1][0].upper()
+    tag_dict = {"J": wordnet.ADJ,
+                "N": wordnet.NOUN,
+                "V": wordnet.VERB,
+                "R": wordnet.ADV}
+    return tag_dict.get(tag, wordnet.NOUN)
+
+def lemmatize_tokens(tokens):
+    lemmatizer = WordNetLemmatizer()
+    # We return a LIST to keep slot alignment perfect
+    return [lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in tokens]
+def preprocess_json_tokens(text_list, slot_list):
+
+    #lemmatization on the whole list
+    # (Doing it before punctuation removal preserves context for POS tagging)
+    lemmatized_text = lemmatize_tokens(text_list)
+
+    clean_text = []
+    clean_slots = []
+
+    #filter out punctuation and lowercase
+    for word, slot in zip(lemmatized_text, slot_list):
+        word = word.lower()
+
+        if word in ['.', ',', '?', '!', ';', ':']:
+            continue
+
+        clean_text.append(word)
+        clean_slots.append(slot)
+
+    return clean_text, clean_slots
+def clean_entire_dataset(raw_data):
+    #Safely handle DataFrames, or raw Lists
+    if isinstance(raw_data, pd.DataFrame):
+        # If it's a Pandas DataFrame, convert it to a list of dicts!
+        data_list = raw_data.to_dict(orient='records')
+    else:
+        # It's already a list of dictionaries
+        data_list = raw_data
+
+    cleaned_dataset = []
+    dropped = 0
+
+    #Now loop over the safely loaded list of dictionaries
+    for item in data_list:
+        clean_text, clean_slots = preprocess_json_tokens(item["text"], item["slots"])
+
+        # Enforce the strict length check immediately
+        if len(clean_text) == len(clean_slots):
+            cleaned_dataset.append({
+                "text": clean_text,
+                "slots": clean_slots,
+                "intent": item["intent"]
+            })
+        else:
+            dropped += 1
+    return pd.DataFrame(cleaned_dataset)
+#preprocess_inference_text for deployment only
+def preprocess_inference_text(raw_string):
+    #Simple tokenization
+    text_list = raw_string.split()
+
+    #Lemmatize
+    lemmatized_text = lemmatize_tokens(text_list)
+
+    clean_text = []
+
+    #Punctuation removal & lowercasing
+    for word in lemmatized_text:
+        word = word.lower()
+        # Clean punctuation
+        word = word.replace('.', '').replace(',', '').replace('?', '').replace('!', '')
+
+        if word == '':
+            continue
+
+        clean_text.append(word)
+
+    return clean_text
+
 class ERPDataset(Dataset):
     def __init__(self, data, word2id, slot2id,intent2id,):
         if isinstance(data, pd.DataFrame):
             self.data = data.to_dict(orient='records')
         else:
             self.data = data
-        self.data = [
-            item for item in self.data
-            if len(item["text"]) == len(item["slots"])
-        ]
         self.word2id = word2id
         self.intent2id = intent2id
         self.slot2id = slot2id
