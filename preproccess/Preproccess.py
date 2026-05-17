@@ -174,8 +174,3 @@ def save_vocabularies(word2id, slot2id, intent2id,save_path="."):
 
     with open(f"{save_path}/slot2id.json", "w", encoding="utf-8") as f:
         json.dump(slot2id, f)
-
-    print("💾 Vocabularies securely saved to disk!")
-
-# Execute it:
-#
