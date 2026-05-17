@@ -4,7 +4,6 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from Model.Model import SGM
 import json
-from pathlib import Path
 # Ensure NLTK resources are available on the deployment server
 nltk.download('wordnet', quiet=True)
 nltk.download('averaged_perceptron_tagger_eng', quiet=True)
