@@ -19,6 +19,7 @@ test = clean_entire_dataset(test)
 #bulding vocab
 word_mapping,word_unmapping = build_vocab(train["text"])
 slot_mapping,intent_mapping,slot_unmapping,intent_unmapping = build_mapping(train)
+save_vocabularies(word_mapping,slot_mapping,intent_mapping)
 #creating the dataset for the model
 train_data = ERPDataset(train,word_mapping,slot_mapping,intent_mapping)
 val_data = ERPDataset(val,word_mapping,slot_mapping,intent_mapping)
@@ -173,4 +174,3 @@ print(f"FINAL TEST RESULTS")
 print(f"Intent Accuracy: {test_intent_acc:.4f}")
 print(f"Slot F1 Score:   {test_slot_f1:.4f}")
 print(f"Frame Accuracy:  {test_frame_acc:.4f}")
-

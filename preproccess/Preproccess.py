@@ -7,7 +7,7 @@ import pandas as pd
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
-
+import json
 # Download requirements once
 nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
@@ -163,3 +163,19 @@ def build_vocab(texts, min_freq=2, max_size=50000):
             break
     word_unmapping = {value:key for key, value in word_mapping.items()}
     return word_mapping,word_unmapping
+
+def save_vocabularies(word2id, slot2id, intent2id,save_path="."):
+
+    with open(f"{save_path}/word2id.json", "w", encoding="utf-8") as f:
+        json.dump(word2id, f)
+
+    with open(f"{save_path}/intent2id.json", "w", encoding="utf-8") as f:
+        json.dump(intent2id, f)
+
+    with open(f"{save_path}/slot2id.json", "w", encoding="utf-8") as f:
+        json.dump(slot2id, f)
+
+    print("💾 Vocabularies securely saved to disk!")
+
+# Execute it:
+#

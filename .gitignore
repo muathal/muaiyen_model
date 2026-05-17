@@ -14,3 +14,6 @@ Model/*.pkl
 Model/*.joblib
 
 .DS_Store
+/intent2id.json
+/slot2id.json
+/word2id.json
